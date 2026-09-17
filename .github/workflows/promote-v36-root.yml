@@ -1,32 +1,9 @@
-name: Promote Vanda v36 to live root
+name: Disabled one-time promoter
 on:
-  push:
-    paths: ['.github/workflows/promote-v36-root.yml']
-permissions:
-  contents: write
+  workflow_dispatch:
 jobs:
-  promote:
+  noop:
+    if: ${{ false }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Download verified current v36
-        env:
-          SOURCE_URL: "https://sdmntprnortheu.oaiusercontent.com/files/00000000-0c14-81f4-a9ed-16f39183a996/raw?se=2026-09-17T05%3A34%3A33Z&sp=r&sv=2026-02-06&sr=b&scid=34653fff-7869-5c6b-8d68-d39383567839&skoid=34268b52-5349-4f34-9be4-e38a5fb9f231&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-17T04%3A18%3A08Z&ske=2026-09-18T04%3A18%3A08Z&sks=b&skv=2026-02-06&sig=7JjJUUAVS5KAObIondIblTT%2BqNdCR8UpAoKC7uLdp0c%3D"
-        run: |
-          curl --fail --location --retry 3 "$SOURCE_URL" -o /tmp/vanda.html
-          test $(wc -c </tmp/vanda.html) -gt 8000000
-          grep -Fq "v36 full QA fix" /tmp/vanda.html
-          grep -Fq "playBtn.addEventListener('click',start)" /tmp/vanda.html
-      - name: Replace both live root and Android web source
-        run: |
-          cp /tmp/vanda.html index.html
-          cp /tmp/vanda.html web/index.html
-          echo "root bytes: $(wc -c <index.html)"
-          echo "web bytes:  $(wc -c <web/index.html)"
-      - name: Commit canonical game
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html web/index.html
-          git commit -m "Replace placeholder with current Vanda v36 game at site root"
-          git push
+      - run: echo disabled
