@@ -1,0 +1,25 @@
+name: Live Pages smoke test
+on:
+  push:
+    paths: ['.github/workflows/live-smoke.yml']
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify deployed root is the actual v36 game
+        run: |
+          set -e
+          URL="https://polyejik.github.io/Vandagame/?qa=${GITHUB_SHA}"
+          ok=0
+          for i in $(seq 1 12); do
+            curl -fsSL -H 'Cache-Control: no-cache' "$URL&try=$i" -o /tmp/live.html || true
+            if grep -Fq "v36 full QA fix" /tmp/live.html 2>/dev/null && grep -Fq "playBtn.addEventListener('click',start)" /tmp/live.html 2>/dev/null; then
+              ok=1
+              break
+            fi
+            sleep 5
+          done
+          test "$ok" = 1
+          test $(wc -c </tmp/live.html) -gt 8000000
+          ! grep -Fq "Полная игровая сборка переносится" /tmp/live.html
+          echo "LIVE_OK bytes=$(wc -c </tmp/live.html)"
